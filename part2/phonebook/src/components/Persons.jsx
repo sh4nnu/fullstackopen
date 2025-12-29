@@ -14,7 +14,7 @@ const Persons = (props) => {
 
     return (
         <>
-            {personsToShow.map(person => <Person key={person.name} person={person} />)}
+            {personsToShow.map(person => <Person key={person.id} person={person} />)}
         </>
     )
 }
