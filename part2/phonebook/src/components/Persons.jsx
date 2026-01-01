@@ -1,8 +1,10 @@
 
 const Person = (props) => {
-    const {person} = props
+    const {person, deletePerson} = props
     return (
-        <p>{person.name} {person.number}</p>
+        <li>{person.name} {person.number}
+        <button onClick={props.deletePerson}>delete</button>
+        </li>
     )
 }
 
@@ -10,12 +12,12 @@ const Person = (props) => {
 
 
 const Persons = (props) => {
-    const { personsToShow } = props
+    const { personsToShow, deletePerson } = props
 
     return (
-        <>
-            {personsToShow.map(person => <Person key={person.id} person={person} />)}
-        </>
+        <ul>
+            {personsToShow.map(person => <Person key={person.id} person={person} deletePerson={() => {deletePerson(person.id)}} />)}
+        </ul>
     )
 }
 export default Persons
