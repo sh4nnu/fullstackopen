@@ -1,6 +1,6 @@
-const Notification = ({ message }) => {
+const Notification = ({ message, color }) => {
   const notifystyle = {
-    color: 'green',
+    color: color ? color : 'black',
     background: 'lightgrey',
     fontSize: '20px',
     borderStyle: 'solid',

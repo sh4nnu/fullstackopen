@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
@@ -11,7 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
-  const [notifyMessage, setNotifyMessage] = useState(null)
+  const [notifyMessage, setNotifyMessage] = useState([null,null])
 
   useEffect(() => {
     personService.getAll()
@@ -45,27 +45,38 @@ const App = () => {
           setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
           setNewName('')
           setNewNumber('')
+          setNotifyMessage([`Updated ${newName}`, 'green'])
+          setTimeout(() => {
+            setNotifyMessage([null,null])
+          }, 5000)
         })
-        }
+        .catch(error => {
+          setNotifyMessage(
+            [`Information of ${newName} has already been removed from server`, 'red']
+          )
+          setTimeout(() => {
+            setNotifyMessage([null,null])
+          }, 5000)
+          setPersons(persons.filter(p => p.id !== person.id))
+        })
+      }
       return
+    } else {
+      const newObject = {
+        name: newName,
+        number: newNumber
+      }
+      personService.create(newObject)
+      .then (createdPerson => {
+        setPersons(persons.concat(createdPerson))
+        setNewName('')
+        setNewNumber('')
+        setNotifyMessage([`Added ${newName}`, 'green'])
+        setTimeout(() => {
+          setNotifyMessage([null,null])
+        }, 5000)
+      })
     }
-    else {
-    const newObject = {
-      name: newName,
-      number: newNumber
-    }
-    personService.create(newObject)
-    .then (createdPerson => {
-      setPersons(persons.concat(createdPerson))
-      setNewName('')
-      setNewNumber('')
-    })
-    
-    }
-    setNotifyMessage(`Added ${newName}`)
-    setTimeout(() => {
-      setNotifyMessage(null)
-    }, 5000)
   }
 
   const deletePerson = id => {
@@ -86,7 +97,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notifyMessage}/>
+      <Notification message={notifyMessage[0]} color={notifyMessage[1]}/>
       <Filter filter={filterName} handleFilterChange={handleFilterNameChange} />
 
       <h2>Add a new</h2>
