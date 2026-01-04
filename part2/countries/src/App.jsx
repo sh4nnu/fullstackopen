@@ -27,34 +27,41 @@ const CountryDetails = ({ country }) => {
   )
 }
 
-/**
- * App component for searching and displaying country information.
- * 
- * Fetches a list of all countries from the REST Countries API and allows users to:
- * - Filter countries by name using a search input
- * - View matching countries in a list with a "show" button
- * - Display detailed information for a selected country
- * 
- * @component
- * @returns {React.ReactElement} The rendered App component with filter input and country details
- * 
- * @example
- * return <App />
- * 
- * @state {Array} countries - List of all countries fetched from the API
- * @state {string} filter - Current filter string entered by the user
- * @state {Object|null} selectedCountry - The currently selected country object, or null if none selected
- * 
- * Behavior:
- * - Shows "Too many matches" message when more than 10 countries match the filter
- * - Shows a list of countries when 2-10 countries match the filter
- * - Shows country details directly when exactly 1 country matches
- * - Shows nothing when filter is empty
- */
+const Weather = ({ country, weather }) => {
+  if (!country) {
+    return null
+  }
+
+  const capital = Array.isArray(country.capital)
+    ? country.capital[0]
+    : country.capital
+
+  if (!capital) {
+    return null
+  }
+
+  return (
+    <div>
+      <h3>Weather in {capital}</h3>
+      {!weather ? (
+        <div>loading...</div>
+      ) : (
+        <div>
+          <div>temperature {weather.temp} C</div>
+          {weather.iconUrl ? <img src={weather.iconUrl} alt={weather.description} /> : null}
+          <div>wind {weather.wind} m/s</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const App = () => {
   const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
+  const [error, setError] = useState(null)
   const [selectedCountry, setSelectedCountry] = useState(null)
+  const [weather, setWeather] = useState(null)
 
   useEffect(() => {
     fetch('https://studies.cs.helsinki.fi/restcountries/api/all')
@@ -78,12 +85,53 @@ const App = () => {
         country.name?.common?.toLowerCase().includes(normalizedFilter)
       )
     : []
+
+  const visibleCountry = matching.length === 1 ? matching[0] : selectedCountry
+
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_WEATHER_API_KEY
+    if (!apiKey || !visibleCountry) {
+      setWeather(null)
+      setError(`Config error: Missing API key or country`)
+      setTimeout(() => setError(null), 500)
+      return
+    }
+
+    const coords = visibleCountry.capitalInfo?.latlng
+    if (!coords || coords.length < 2) {
+      setWeather(null)
+      return
+    }
+
+    const [lat, lon] = coords
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (!data || !data.main || !data.weather || !data.weather[0]) {
+          setWeather(null)
+          return
+        }
+        setWeather({
+          temp: data.main.temp,
+          wind: data.wind?.speed ?? null,
+          iconUrl: data.weather[0].icon
+            ? `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
+            : null,
+          description: data.weather[0].description || 'weather',
+        })
+      })
+      .catch(() => {
+        setWeather(null)
+      })
+  }, [visibleCountry])
   
   return (
     <div>
       <div>
         find countries <input value={filter} onChange={handleFilterChange} />
       </div>
+      {error ? <div>{error}</div> : null}
       {normalizedFilter.length === 0 ? null : matching.length > 10 ? (
         <div>Too many matches, specify another filter</div>
       ) : matching.length > 1 ? (
@@ -99,9 +147,13 @@ const App = () => {
             ))}
           </ul>
           <CountryDetails country={selectedCountry} />
+          <Weather country={selectedCountry} weather={weather} />
         </div>
       ) : (
-        <CountryDetails country={matching[0]} />
+        <div>
+          <CountryDetails country={matching[0]} />
+          <Weather country={matching[0]} weather={weather} />
+        </div>
       )}
     </div>
   )
