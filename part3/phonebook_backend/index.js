@@ -6,6 +6,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
 
+app.use(express.json())
 let persons =
 [
     { 
@@ -36,4 +37,57 @@ app.get('/', (req, res) => {
 
 app.get('/api/persons', (req, res) => {
     res.json(persons)
+})
+
+app.get('/info', (req, res) => {
+    const date = new Date()
+    res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
+})
+
+app.get('/api/persons/:id', (req, res) => {
+    const id = req.params.id
+    const person = persons.find(person => person.id === id)
+    if (person) {
+        res.json(person)
+    } else {
+        res.status(404).end()
+    }
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+    const id = req.params.id
+    persons = persons.filter(person => person.id !== id)
+    res.status(204).end()
+})
+
+
+
+
+const generateId = () => {
+    let randomID = Math.floor(Math.random() * 10000)
+    while (persons.some(person => person.id === randomID.toString())) {
+        randomID = Math.floor(Math.random() * 10000)
+    }
+    return randomID.toString()
+}
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+    if (!body.name || !body.number) {
+        return res.status(400).json({
+            error: 'name or number missing'
+        })
+    }
+    if (persons.some(person => person.name === body.name)) {
+        return res.status(400).json({
+            error: 'name must be unique'
+        })
+    }
+    const newPerson = {
+        id: generateId(),
+        name: body.name,
+        number: body.number
+    }
+    persons = persons.concat(newPerson)
+    res.json(newPerson)
 })
