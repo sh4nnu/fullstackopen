@@ -9,6 +9,9 @@ app.listen(PORT, () => {
 })
 
 app.use(express.json())
+const cors = require('cors')
+app.use(cors())
+app.use(express.static('dist'))
 // morgan('tiny')
 app.use(morgan(function (tokens, req, res) {
     return [
