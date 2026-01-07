@@ -9,46 +9,45 @@ const PORT = process.env.PORT
 const Person = require('./models/person')
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+    console.log(`Server running on port ${PORT}`)
 })
+app.use(express.static('dist'))
 
 app.use(express.json())
 const cors = require('cors')
 app.use(cors())
-app.use(express.static('dist'))
 // morgan('tiny')
 app.use(morgan(function (tokens, req, res) {
     return [
-      tokens.method(req, res),
-      tokens.url(req, res),
-      tokens.status(req, res),
-      tokens.res(req, res, 'content-length'), '-',
-      tokens['response-time'](req, res), 'ms',
-      JSON.stringify(req.body)
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        JSON.stringify(req.body)
     ].join(' ')
-  }))
+}))
 // app.use(morgan('tiny'))
-let persons =
-[
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
+let persons = [
+    {
+        'id': '1',
+        'name': 'Arto Hellas',
+        'number': '040-123456'
     },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
+    {
+        'id': '2',
+        'name': 'Ada Lovelace',
+        'number': '39-44-5323523'
     },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
+    {
+        'id': '3',
+        'name': 'Dan Abramov',
+        'number': '12-43-234345'
     },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
+    {
+        'id': '4',
+        'name': 'Mary Poppendieck',
+        'number': '39-23-6423122'
     }
 ]
 
@@ -57,6 +56,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
+    console.log('fetching persons from database')
     Person.find({}).then(persons => {
         res.json(persons)
     })
@@ -104,11 +104,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 app.post('/api/persons', (req, res, next) => {
     const body = req.body
-    if (!body.name || !body.number) {
-        return res.status(400).json({
-            error: 'name or number missing'
-        })
-    }
+
     if (persons.some(person => person.name === body.name)) {
         return res.status(400).json({
             error: 'name must be unique'
@@ -123,17 +119,13 @@ app.post('/api/persons', (req, res, next) => {
     }).catch(error => {
         next(error)
     })
-    
+
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
     const id = req.params.id
     const body = req.body
-    if (!body.name || !body.number) {
-        return res.status(400).json({
-            error: 'name or number missing'
-        })
-    }
+
     const updatedPerson = {
         name: body.name,
         number: body.number
@@ -150,6 +142,8 @@ const errorHandler = (error, req, res, next) => {
     console.error(error.message)
     if (error.name === 'CastError') {
         return res.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message })
     }
     next(error)
 }
