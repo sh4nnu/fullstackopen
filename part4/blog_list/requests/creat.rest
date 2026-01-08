@@ -11,3 +11,31 @@ Content-Type: application/json
   "url": "http://example.com/test-blog",
   "likes": 5
 }
+
+###
+@id = 695fcae2e01cbb46a671c81f
+DELETE http://localhost:3003/api/blogs/{{id}}
+
+###
+@id_to_update = 695fcae2e01cbb46a671c81f
+PUT http://localhost:3003/api/blogs/{{id_to_update}}
+Content-Type: application/json  
+
+{
+  "title": "Updated Test Blog",
+  "author": "John Doe",
+  "url": "http://example.com/updated-test-blog",
+  "likes": 10
+}
+
+###
+@id_to_update = 695fcae2e01caa46a671c81f
+PUT http://localhost:3003/api/blogs/{{id_to_update}}
+Content-Type: application/json  
+
+{
+  "title": "Updated Test Blog",
+  "author": "John Doe",
+  "url": "http://example.com/updated-test-blog",
+  "likes": 10
+}
