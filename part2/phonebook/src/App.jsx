@@ -18,6 +18,8 @@ const App = () => {
       .then(personsData => {
         setPersons(personsData)
       })
+      console.log('persons fetched')
+      console.log(persons)
   }, [])
 
   const handleFilterNameChange = (event) => {
@@ -51,9 +53,8 @@ const App = () => {
           }, 5000)
         })
         .catch(error => {
-          setNotifyMessage(
-            [`Information of ${newName} has already been removed from server`, 'red']
-          )
+          const errorMessage = error.response?.data?.error
+          setNotifyMessage([errorMessage || 'Bad request', 'red'])
           setTimeout(() => {
             setNotifyMessage([null,null])
           }, 5000)
@@ -72,6 +73,13 @@ const App = () => {
         setNewName('')
         setNewNumber('')
         setNotifyMessage([`Added ${newName}`, 'green'])
+        setTimeout(() => {
+          setNotifyMessage([null,null])
+        }, 5000)
+      })
+      .catch(error => {
+        const errorMessage = error.response?.data?.error || 'Failed to add person'
+        setNotifyMessage([errorMessage, 'red'])
         setTimeout(() => {
           setNotifyMessage([null,null])
         }, 5000)

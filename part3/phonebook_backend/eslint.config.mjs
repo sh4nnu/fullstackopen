@@ -9,7 +9,7 @@ export default defineConfig([
     files: ['**/*.{js,mjs,cjs}'],
     languageOptions: {
       globals: globals.node,
-      sourceType: 'commonjs',
+      sourceType: 'module',
     },
     plugins: {
       '@stylistic': stylistic,
