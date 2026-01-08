@@ -3,9 +3,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hbmlraXNoYW4iLCJpZCI6IjY5NjAyYTE0OTU1MjdlMjQ3NzZlMmQwYiIsImlhdCI6MTc2NzkxMDY2OX0.MM2w-xxsVk8qXu-oLN_YNgiz5TMo29xqEVhNLOUp4o8
 
 {
-    "title": "Test Blog with auth",
-    "author": "Test Author",
+    "title": "Test Blog with jwt",
+    "author": "TMani",
     "url": "http://testblog.com",
-    "likes": 5
+    "likes": 50
 }
 ###
