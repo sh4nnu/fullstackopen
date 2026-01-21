@@ -96,6 +96,20 @@ const App = () => {
       showNotification(`failed to like blog: ${error}`, 'red')
     }
   }
+  const handleDelete = async (blog) => {
+    const confirmDelete = window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
+    if (!confirmDelete) {
+      return
+    }
+    
+    try { 
+      await blogService.deleteBlog(blog.id)
+      setBlogs(blogs.filter(item => item.id !== blog.id))
+      showNotification(`deleted blog: ${blog.title}`, 'green')
+    } catch (error) {
+      showNotification(`failed to delete blog: ${error}`, 'red')
+    }
+  } 
 
   if (user === null) {
     return (
@@ -124,7 +138,7 @@ const App = () => {
       </Togglable>
       
       {sortedBlogs.map(blog =>
-        <Blog key={blog.id} blog={blog} onLike={handleLike} />
+        <Blog key={blog.id} blog={blog} onLike={handleLike} onDelete={handleDelete} />
       )}
     </div>
   )
