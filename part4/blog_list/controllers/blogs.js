@@ -45,7 +45,16 @@ blogRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
 
 
 blogRouter.put('/:id', async (request, response) => {
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, request.body, { new: true })
+  const body = request.body
+  const blogData = {
+    ...body,
+    user: body.user?.id || body.user,
+  }
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    blogData,
+    { new: true }
+  ).populate('user', { username: 1, name: 1 })
   response.json(updatedBlog)
 })
 

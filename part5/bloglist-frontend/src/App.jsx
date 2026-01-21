@@ -69,16 +69,33 @@ const App = () => {
     setUser(null)
   }
 
-const addBlog = async (blogObject) =>{
-        try {
-        const newBlog = await blogService.create(blogObject)
-        setBlogs(blogs.concat(newBlog))
-        
-        showNotification(`a new blog  ${newBlog.title}! by ${newBlog.author} added`, 'green')
-        } catch (error) {
-        showNotification(`failed to create blog: ${error}`, 'red')
-        }
+  const addBlog = async (blogObject) => {
+    try {
+      const newBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(newBlog))
+
+      showNotification(`a new blog  ${newBlog.title}! by ${newBlog.author} added`, 'green')
+    } catch (error) {
+      showNotification(`failed to create blog: ${error}`, 'red')
     }
+  }
+
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+      user: blog.user?.id || blog.user,
+    }
+
+    try {
+      const savedBlog = await blogService.update(blog.id, updatedBlog)
+      setBlogs(blogs.map(item => (item.id === blog.id ? savedBlog : item)))
+    } catch (error) {
+      showNotification(`failed to like blog: ${error}`, 'red')
+    }
+  }
 
   if (user === null) {
     return (
@@ -104,10 +121,10 @@ const addBlog = async (blogObject) =>{
         <BlogForm createBlog={addBlog} />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} onLike={handleLike} />
       )}
     </div>
   )
 }
-
+// TODO: 5.7
 export default App
