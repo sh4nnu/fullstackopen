@@ -13,13 +13,13 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  
+
   const [notifyMessage, setNotifyMessage] = useState(null)
   const [notifyColor, setNotifyColor] = useState(null)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-    if (loggedUserJSON && loggedUserJSON !='null') {
+    if (loggedUserJSON && loggedUserJSON !=='null') {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
@@ -29,7 +29,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
 
@@ -57,7 +57,7 @@ const App = () => {
       setPassword('')
       showNotification('login successful', 'green')
     } catch (error) {
-      showNotification('wrong username or password', 'red')
+      showNotification(`wrong username or password: ${error}`, 'red')
       setPassword('')
     }
   }
@@ -101,15 +101,14 @@ const App = () => {
     if (!confirmDelete) {
       return
     }
-    
-    try { 
+    try {
       await blogService.deleteBlog(blog.id)
       setBlogs(blogs.filter(item => item.id !== blog.id))
       showNotification(`deleted blog: ${blog.title}`, 'green')
     } catch (error) {
       showNotification(`failed to delete blog: ${error}`, 'red')
     }
-  } 
+  }
 
   if (user === null) {
     return (
@@ -136,7 +135,7 @@ const App = () => {
       <Togglable buttonLabel="create new blog">
         <BlogForm createBlog={addBlog} />
       </Togglable>
-      
+
       {sortedBlogs.map(blog =>
         <Blog key={blog.id} blog={blog} onLike={handleLike} onDelete={handleDelete} />
       )}
