@@ -31,6 +31,8 @@ const Blog = ({ blog, onLike }) => {
               like
             </button>
           </div>
+          <div>{blog.user?.name}</div>
+          
         </div>
       )}
     </div>

@@ -112,6 +112,8 @@ const App = () => {
     )
   }
 
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+
   return (
     <div>
       <Notification message={notifyMessage} color={notifyColor} />
@@ -120,11 +122,12 @@ const App = () => {
       <Togglable buttonLabel="create new blog">
         <BlogForm createBlog={addBlog} />
       </Togglable>
-      {blogs.map(blog =>
+      
+      {sortedBlogs.map(blog =>
         <Blog key={blog.id} blog={blog} onLike={handleLike} />
       )}
     </div>
   )
 }
-// TODO: 5.7
+// TODO: 5.11
 export default App
